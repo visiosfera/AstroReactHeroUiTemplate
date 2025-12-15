@@ -4,7 +4,7 @@ pipeline {
   environment {
     IMAGE_NAME = "astro-app"
     CONTAINER_NAME = "astro-app"
-    PORT = "8085"
+    PORT = "8086"
   }
 
   stages {
@@ -37,7 +37,7 @@ pipeline {
         sh '''
           docker stop ${CONTAINER_NAME} || true
           docker rm ${CONTAINER_NAME} || true
-          docker run -d --name ${CONTAINER_NAME} -p 8085:4321 ${IMAGE_NAME}:latest
+          docker run -d --name ${CONTAINER_NAME} -p 8086:4321 ${IMAGE_NAME}:latest
         '''
       }
     }

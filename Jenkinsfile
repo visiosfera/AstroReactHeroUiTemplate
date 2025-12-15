@@ -1,0 +1,45 @@
+pipeline {
+  agent any
+
+  environment {
+    IMAGE_NAME = "astro-app"
+    CONTAINER_NAME = "astro-app"
+    PORT = "8085"
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Install') {
+      steps {
+        sh 'npm ci'
+      }
+    }
+
+    stage('Build Astro') {
+      steps {
+        sh 'npm run build'
+      }
+    }
+
+    stage('Docker Build') {
+      steps {
+        sh 'docker build -t ${IMAGE_NAME}:latest .'
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        sh '''
+          docker stop ${CONTAINER_NAME} || true
+          docker rm ${CONTAINER_NAME} || true
+          docker run -d --name ${CONTAINER_NAME} -p 8085:4321 ${IMAGE_NAME}:latest
+        '''
+      }
+    }
+  }
+}

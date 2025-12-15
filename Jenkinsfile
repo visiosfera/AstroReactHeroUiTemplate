@@ -37,7 +37,11 @@ pipeline {
         sh '''
           docker stop ${CONTAINER_NAME} || true
           docker rm ${CONTAINER_NAME} || true
-          docker run -d --name ${CONTAINER_NAME} -p 8086:4321 ${IMAGE_NAME}:latest
+          docker run -d --name ${CONTAINER_NAME} \
+            -e HOST=0.0.0.0 \
+            -e PORT=4321 \
+            -p 8086:4321 \
+            ${IMAGE_NAME}:latest
         '''
       }
     }

@@ -1,3 +1,4 @@
+import { Ambiente } from '@/server/ambiente';
 import { Button, getKeyValue, Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -9,6 +10,9 @@ export default function Pagina() {
     { key: "userId", label: "Usuário" },
   ];
 
+  type OracleUserResponse = { mensagem: string };
+
+  const [oracleUser, setOracleUser] = useState<any>();
   const [posts, setPosts] = useState<Post[]>([]);
   useEffect(() => {
     const fetchPosts = async () => {
@@ -19,10 +23,18 @@ export default function Pagina() {
         }
         const data: Post[] = await res.json();
         setPosts(data);
+
+
+        const ambiente = new Ambiente();
+        const resultado = await ambiente.teste();
+        setOracleUser(resultado);  
+        console.log(resultado);
+
       } catch (error) {
         console.error(error);
       }
     };
+
 
     fetchPosts();
   }, []);
@@ -39,39 +51,43 @@ export default function Pagina() {
     return posts.slice(start, end);
   }, [page, posts]);
 
-  return <div>
-    <Table aria-label="Posts"
-      isStriped
-      bottomContent={
-        <div className="flex w-full justify-center">
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            color="secondary"
-            page={page}
-            total={pages}
-            onChange={(page) => setPage(page)}
-          />
-        </div>
-      }
-      classNames={{
-        wrapper: "min-h-[222px]",
-      }}
-    >
-      <TableHeader columns={columns}>
-        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-      </TableHeader>
-      <TableBody items={items}>
-        {(item) => (
-          <TableRow key={item.id}>
-            {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+  return (
+    <div>
+      <p>{oracleUser?.mensagem}</p>
+      <Table aria-label="Posts"
+        isStriped
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="secondary"
+              page={page}
+              total={pages}
+              onChange={(page) => setPage(page)}
+            />
+          </div>
+        }
+        classNames={{
+          wrapper: "min-h-[222px]",
+        }}
+      >
+        <TableHeader columns={columns}>
+          {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+        </TableHeader>
+        <TableBody items={items}>
+          {(item) => (
+            <TableRow key={item.id}>
+              {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
 
-  </div>;
+    </div>
+  );
+
 }
 
 export type Post = {
